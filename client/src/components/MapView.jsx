@@ -55,7 +55,7 @@ export default function MapView({ results, searchCoords }) {
         map.current = null;
       }
     };
-  }, []);
+  }, [searchCoords]);
 
   useEffect(() => {
     if (!map.current || !markersLayer.current || !results.length) return;
