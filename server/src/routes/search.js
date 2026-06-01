@@ -16,17 +16,21 @@ router.post("/", async (req, res) => {
     const { lat, lon } = coords;
     const cached = await getCached(keyword, lat, lon, radius);
     if (cached) {
-      console.log(`cache hit:${keyword} @ ${lat}, ${lon} r=${radius}`);
-      return res.json({ results: cached, fromCache: true });
+      return res.json({
+        results: cached,
+        fromCache: true,
+        coords: { lat, lon },
+      });
     }
-    console.log(
-      `Cache MISS: ${keyword} @ ${lat},${lon} r=${radius} → calling Google`,
-    );
     const places = await searchGooglePlaces(lat, lon, radius, keyword);
     if (places.length > 0) {
       await saveCache(keyword, lat, lon, radius, places);
     }
-    return res.json({ results: places, fromCache: false });
+    return res.json({
+      results: places,
+      fromCache: false,
+      coords: { lat, lon },
+    });
   } catch (err) {
     console.error("Search error:", err.message);
     return res.status(500).json({ error: err.message });

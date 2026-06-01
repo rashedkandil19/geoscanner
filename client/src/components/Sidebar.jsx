@@ -75,9 +75,9 @@ export default function Sidebar({ activeTab, onTabChange }) {
         >
           <path
             d="M6 4.5C6 3.67 6.67 3 7.5 3H16.5C17.33 3 18 3.67 18 4.5V21L12 17L6 21V4.5Z"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </svg>
       ),
@@ -160,10 +160,10 @@ export default function Sidebar({ activeTab, onTabChange }) {
             >
               <path
                 d="M12 3.5L13.8 4.8L16 4.4L16.8 6.5L18.9 7.4L18.5 9.6L20 11.5L18.5 13.4L18.9 15.6L16.8 16.5L16 18.6L13.8 18.2L12 19.5L10.2 18.2L8 18.6L7.2 16.5L5.1 15.6L5.5 13.4L4 11.5L5.5 9.6L5.1 7.4L7.2 6.5L8 4.4L10.2 4.8L12 3.5Z"
-                stroke-width="2"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinejoin="round"
               />
-              <circle cx="12" cy="11.5" r="3" stroke-width="2" />
+              <circle cx="12" cy="11.5" r="3" strokeWidth="2" />
             </svg>
           </span>
           <span className="tab-label">Settings</span>

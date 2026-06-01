@@ -65,7 +65,11 @@ export default function Home() {
     showMsg("Locating coordinates...", "loading");
 
     try {
-      const { results: places } = await searchPlaces(location, keyword, radius);
+      const { results: places, coords } = await searchPlaces(
+        location,
+        keyword,
+        radius,
+      );
 
       if (!places.length) {
         showMsg(
@@ -84,6 +88,8 @@ export default function Home() {
         website: null,
         opening: place.opening_hours?.open_now ? "Open Now" : "Unknown",
         mapUrl: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
+        lat: place.geometry?.location?.lat ?? null,
+        lon: place.geometry?.location?.lng ?? null,
       }));
 
       const withPhone = mapped.filter((r) => r.phone !== "—").length;
@@ -93,10 +99,8 @@ export default function Home() {
       setResults(mapped);
       setStats({ total: mapped.length, withPhone, withWeb });
       addToHistory(location, keyword, radius);
-
-      // Store coordinates for map
-      setLat(30.0444);
-      setLonValue(31.2357);
+      setLat(coords.lat);
+      setLonValue(coords.lon);
     } catch (e) {
       showMsg(`⚠ ${e.message}`, "error");
     } finally {
@@ -106,6 +110,30 @@ export default function Home() {
 
   function handleKeyDown(e) {
     if (e.key === "Enter") startSearch();
+  }
+  function exportCSV() {
+    if (!results.length) return;
+    const headers = ["#", "Name", "Address", "Category", "Status", "MapLink"];
+    const rows = results.map((r, i) => [
+      i + 1,
+      r.name,
+      r.address,
+      r.category.replace(/_/g, " "),
+      r.opening,
+      r.mapUrl,
+    ]);
+    const csv = [headers, ...rows]
+      .map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
+      )
+      .join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `geoscanner-${keyword}-${location}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -265,11 +293,26 @@ export default function Home() {
           <div className="container">
             <div className="panel">
               <div className="panel-label">Export Results</div>
-              <div
-                style={{ padding: "20px", textAlign: "center", color: "#888" }}
-              >
-                Export feature coming soon
-              </div>
+              {results.length === 0 ? (
+                <div
+                  style={{
+                    padding: "20px",
+                    textAlign: "center",
+                    color: "#888",
+                  }}
+                >
+                  Do a search first to export results
+                </div>
+              ) : (
+                <div style={{ padding: "20px" }}>
+                  <div style={{ marginBottom: "20px", color: "#ccc" }}>
+                    {results.length} results ready to export
+                  </div>
+                  <button className="btn-search" onClick={exportCSV}>
+                    ⬇ Export as CSV
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

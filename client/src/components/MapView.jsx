@@ -18,8 +18,11 @@ export default function MapView({ results, searchCoords }) {
   const markersLayer = useRef(null);
 
   useEffect(() => {
-    if (map.current) return;
     if (!mapContainer.current) return;
+    if (map.current) {
+      map.current.remove();
+      map.current = null;
+    }
 
     const initialLat = searchCoords?.lat || 20;
     const initialLon = searchCoords?.lon || 0;
@@ -32,12 +35,11 @@ export default function MapView({ results, searchCoords }) {
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "© OpenStreetMap contributors",
       maxZoom: 19,
-      className: "map-tiles",
     }).addTo(map.current);
 
     markersLayer.current = L.layerGroup().addTo(map.current);
 
-    if (searchCoords) {
+    if (searchCoords?.lat && searchCoords?.lon) {
       L.circleMarker([searchCoords.lat, searchCoords.lon], {
         color: "#00d4ff",
         radius: 8,
@@ -72,12 +74,10 @@ export default function MapView({ results, searchCoords }) {
     };
 
     results.forEach((place, index) => {
-      const hash = place.name.length + place.address.length;
-      const offsetLat = (hash % 100) / 5000;
-      const offsetLon = ((hash * 7) % 100) / 5000;
+      const lat = place.lat;
+      const lon = place.lon;
 
-      const lat = searchCoords?.lat + offsetLat || 20;
-      const lon = searchCoords?.lon + offsetLon || 0;
+      if (!lat || !lon) return;
 
       const category = place.category.toLowerCase();
       const color = Object.keys(categoryColors).find((key) =>
@@ -88,25 +88,30 @@ export default function MapView({ results, searchCoords }) {
 
       const marker = L.circleMarker([lat, lon], {
         color: color,
-        radius: 6,
+        radius: 8,
         fillColor: color,
         fillOpacity: 0.8,
         weight: 2,
       });
 
+      const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.name + " " + place.address)}`;
+
       const popupContent = `
         <div class="map-popup">
           <div class="popup-name">${place.name}</div>
-          <div class="popup-category">${place.category}</div>
-          <div class="popup-address">${place.address}</div>
+          <div class="popup-category">${place.category.replace(/_/g, " ")}</div>
+          <div class="popup-address">📍 ${place.address}</div>
           ${
             place.opening !== "Unknown"
-              ? `<div class="popup-status">${place.opening}</div>`
+              ? `<div class="popup-status ${place.opening === "Open Now" ? "open" : "closed"}">
+                  ${place.opening === "Open Now" ? "🟢 Open Now" : "🔴 Closed"}
+                </div>`
               : ""
           }
-          <a href="${place.mapUrl}" target="_blank" class="popup-link">
-            Open in Google Maps →
-          </a>
+          <div class="popup-actions">
+            <a href="${place.mapUrl}" target="_blank" class="popup-btn">📌 View on Maps</a>
+            <a href="${directionsUrl}" target="_blank" class="popup-btn directions">🧭 Get Directions</a>
+          </div>
         </div>
       `;
 
@@ -119,7 +124,9 @@ export default function MapView({ results, searchCoords }) {
         iconSize: [30, 30],
       });
 
-      L.marker([lat, lon], { icon: label }).addTo(markersLayer.current);
+      L.marker([lat, lon], { icon: label, interactive: false }).addTo(
+        markersLayer.current,
+      );
     });
 
     if (results.length > 0) {
@@ -128,7 +135,7 @@ export default function MapView({ results, searchCoords }) {
         map.current.fitBounds(group.getBounds(), { padding: [50, 50] });
       }
     }
-  }, [results, searchCoords]);
+  }, [results]);
 
   return (
     <div className="map-container">
