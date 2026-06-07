@@ -100,17 +100,17 @@ export default function MapView({ results, searchCoords }) {
         <div class="map-popup">
           <div class="popup-name">${place.name}</div>
           <div class="popup-category">${place.category.replace(/_/g, " ")}</div>
-          <div class="popup-address">📍 ${place.address}</div>
+          <div class="popup-address">${place.address}</div>
           ${
             place.opening !== "Unknown"
               ? `<div class="popup-status ${place.opening === "Open Now" ? "open" : "closed"}">
-                  ${place.opening === "Open Now" ? "🟢 Open Now" : "🔴 Closed"}
+                  ${place.opening === "Open Now" ? "Open Now" : "Closed"}
                 </div>`
               : ""
           }
           <div class="popup-actions">
-            <a href="${place.mapUrl}" target="_blank" class="popup-btn">📌 View on Maps</a>
-            <a href="${directionsUrl}" target="_blank" class="popup-btn directions">🧭 Get Directions</a>
+            <a href="${place.mapUrl}" target="_blank" class="popup-btn"> View on Maps</a>
+            <a href="${directionsUrl}" target="_blank" class="popup-btn directions"> Get Directions</a>
           </div>
         </div>
       `;

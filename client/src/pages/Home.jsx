@@ -24,9 +24,37 @@ export default function Home() {
   const [showResults, setShowResults] = useState(false);
   const [lat, setLat] = useState(null);
   const [lonValue, setLonValue] = useState(null);
+  const [filters, setFilters] = useState({
+    openNow: false,
+    hasPhone: false,
+    hasWebsite: false,
+  });
   const [searchHistory, setSearchHistory] = useState(
     JSON.parse(localStorage.getItem("searchHistory")) || [],
   );
+  const [collections, setCollections] = useState(
+    JSON.parse(localStorage.getItem("collections")) || [],
+  );
+
+  // Bug 1 fixed: isInCollection is now outside toggleCollection
+  function isInCollection(place) {
+    return collections.some((p) => p.mapUrl === place.mapUrl);
+  }
+
+  // Bug 2 fixed: consistent name toggleCollection
+  // Bug 3 fixed: [...collections, place] not [collections, place]
+  // Bug 4 fixed: comma not dot in localStorage.setItem
+  function toggleCollection(place) {
+    const exists = collections.find((p) => p.mapUrl === place.mapUrl);
+    let updated;
+    if (exists) {
+      updated = collections.filter((p) => p.mapUrl !== place.mapUrl);
+    } else {
+      updated = [...collections, place];
+    }
+    setCollections(updated);
+    localStorage.setItem("collections", JSON.stringify(updated));
+  }
 
   function showMsg(text, type = "") {
     setMessage(text);
@@ -111,6 +139,7 @@ export default function Home() {
   function handleKeyDown(e) {
     if (e.key === "Enter") startSearch();
   }
+
   function exportCSV() {
     if (!results.length) return;
     const headers = ["#", "Name", "Address", "Category", "Status", "MapLink"];
@@ -136,15 +165,22 @@ export default function Home() {
     URL.revokeObjectURL(url);
   }
 
+  const filteredResults = results.filter((r) => {
+    if (filters.openNow && r.opening !== "Open Now") return false;
+    if (filters.hasPhone && r.phone === "—") return false;
+    if (filters.hasWebsite && !r.website) return false;
+    return true;
+  });
+
   return (
-    <div className="app-layout">
+    <div className="app-layout" onKeyDown={handleKeyDown}>
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       <div className="main-content">
         <Header />
 
         {activeTab === "search" && (
-          <div className="container" onKeyDown={handleKeyDown}>
+          <div className="container">
             <div className="panel">
               <div className="panel-label">Search Parameters</div>
               <div className="input-grid">
@@ -180,11 +216,81 @@ export default function Home() {
               <div className="panel result-panel">
                 <div className="scanline" />
                 <div className="panel-label">Results</div>
+
+                {/* Filters */}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    marginBottom: "15px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {[
+                    { key: "openNow", label: "🟢 Open Now" },
+                    { key: "hasPhone", label: "📞 Has Phone" },
+                    { key: "hasWebsite", label: "🌐 Has Website" },
+                  ].map((f) => (
+                    <button
+                      key={f.key}
+                      onClick={() =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          [f.key]: !prev[f.key],
+                        }))
+                      }
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: "20px",
+                        border: "1px solid",
+                        cursor: "pointer",
+                        fontSize: "0.85rem",
+                        background: filters[f.key]
+                          ? "var(--accent)"
+                          : "transparent",
+                        color: filters[f.key] ? "var(--bg)" : "var(--text2)",
+                        borderColor: filters[f.key]
+                          ? "var(--accent)"
+                          : "var(--border)",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                  {(filters.openNow ||
+                    filters.hasPhone ||
+                    filters.hasWebsite) && (
+                    <button
+                      onClick={() =>
+                        setFilters({
+                          openNow: false,
+                          hasPhone: false,
+                          hasWebsite: false,
+                        })
+                      }
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: "20px",
+                        border: "1px solid var(--accent2)",
+                        cursor: "pointer",
+                        fontSize: "0.85rem",
+                        background: "transparent",
+                        color: "var(--accent2)",
+                      }}
+                    >
+                      ✕ Clear
+                    </button>
+                  )}
+                </div>
+
                 <StatusBar stats={stats} />
                 <ResultsTable
-                  results={results}
+                  results={filteredResults}
                   message={message}
                   msgType={msgType}
+                  onToggleCollection={toggleCollection}
+                  isInCollection={isInCollection}
                 />
               </div>
             )}
@@ -215,6 +321,7 @@ export default function Home() {
                         borderBottom: "1px solid #333",
                         cursor: "pointer",
                         marginBottom: "8px",
+                        position: "relative",
                       }}
                       onClick={() => {
                         setLocation(search.location);
@@ -229,6 +336,22 @@ export default function Home() {
                       <div style={{ fontSize: "0.85rem", color: "#aaa" }}>
                         {search.timestamp}
                       </div>
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSearchHistory((prev) =>
+                            prev.filter((item) => item.id !== search.id),
+                          );
+                        }}
+                        style={{
+                          position: "absolute",
+                          right: "20px",
+                          top: "19px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        X
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -240,24 +363,106 @@ export default function Home() {
         {activeTab === "collections" && (
           <div className="container">
             <div className="panel">
-              <div className="panel-label">Saved Collections</div>
-              <div
-                style={{ padding: "20px", textAlign: "center", color: "#888" }}
-              >
-                Collections coming soon
+              <div className="panel-label">
+                Saved Places ({collections.length})
               </div>
+              {collections.length === 0 ? (
+                <div
+                  style={{
+                    padding: "20px",
+                    textAlign: "center",
+                    color: "#888",
+                  }}
+                >
+                  No saved places yet — click ⭐ on any result to save it
+                </div>
+              ) : (
+                <div style={{ padding: "10px" }}>
+                  {collections.map((place) => (
+                    <div
+                      key={place.mapUrl}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "12px",
+                        borderBottom: "1px solid #333",
+                        gap: "10px",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 600 }}>{place.name}</div>
+                        <div style={{ fontSize: "0.8rem", color: "#aaa" }}>
+                          {place.address}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "var(--accent)",
+                            marginTop: "4px",
+                          }}
+                        >
+                          {place.category.replace(/_/g, " ")}
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "8px",
+                          alignItems: "center",
+                        }}
+                      >
+                        <a
+                          href={place.mapUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ color: "var(--accent)", fontSize: "0.8rem" }}
+                        >
+                          Maps
+                        </a>
+                        <button
+                          onClick={() => toggleCollection(place)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: "1.2rem",
+                            color: "#ffd43b",
+                          }}
+                        >
+                          ★
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {activeTab === "analytics" && (
           <div className="container">
-            <div className="panel">
+            <div className="panel analytics-panel">
               <div className="panel-label">Analytics</div>
-              <div
-                style={{ padding: "20px", textAlign: "center", color: "#888" }}
-              >
-                Analytics dashboard coming soon
+
+              <div className="analytics-content">
+                <h2>Location Intelligence Platform</h2>
+
+                <p>
+                  Transform location data into actionable insights. Discover
+                  demand hotspots, analyze competitors, identify market gaps,
+                  track business density, and uncover new opportunities through
+                  advanced geographic analytics.
+                </p>
+
+                <p>
+                  Whether you're a business owner, marketer, investor, or
+                  researcher, GeoScanner Analytics will help you make smarter
+                  decisions backed by real-world location data.
+                </p>
+
+                <div className="coming-soon-badge"> Coming Soon</div>
               </div>
             </div>
           </div>
@@ -267,8 +472,10 @@ export default function Home() {
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             {results.length > 0 ? (
               <MapView
-                results={results}
+                results={filteredResults}
                 searchCoords={{ lat, lon: lonValue }}
+                onToggleCollection={toggleCollection}
+                isInCollection={isInCollection}
               />
             ) : (
               <div className="container">

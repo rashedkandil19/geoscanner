@@ -528,7 +528,6 @@ tbody td.phone {
   }
 }
 
-/* ─── App Layout with Sidebar ─────────────────────────────────────────────── */
 .app-layout {
   display: flex;
   min-height: 100vh;
@@ -639,7 +638,6 @@ tbody td.phone {
   flex-direction: column;
 }
 
-/* ─── Main Container ──────────────────────────────────────────────────────── */
 .container {
   flex: 1;
   padding: 20px;
@@ -706,14 +704,13 @@ tbody td.phone {
   box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
 }
 
-/* ─── Sidebar Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .sidebar {
-    width: 60px;
+    width: 50px;
   }
 
   .main-content {
-    margin-left: 60px;
+    margin-left: 40px;
   }
 
   .sidebar-title,
@@ -730,7 +727,7 @@ tbody td.phone {
     height: 35px;
   }
 }
-/* ─── Map Styling ───────────────────────────────────────────────────────────── */
+
 .map-container {
   flex: 1;
   display: flex;
@@ -852,7 +849,7 @@ tbody td.phone {
 .popup-link:hover {
   color: var(--accent2);
 }
-/* ─── Popup Styles ───────────────────────────────────────────────────────── */
+
 .map-popup {
   min-width: 200px;
   font-family: "Space Grotesk", sans-serif;
@@ -920,4 +917,49 @@ tbody td.phone {
   background: #1a73e8;
   color: #fff;
   border-color: #1a73e8;
+}
+
+.analytics-panel {
+  min-height: 450px;
+}
+
+.analytics-content {
+  padding: 40px 30px;
+  text-align: center;
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+.analytics-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.analytics-content h2 {
+  color: #fff;
+  font-size: 2rem;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.analytics-content p {
+  color: #9ca3af;
+  line-height: 1.8;
+  font-size: 1rem;
+  margin-bottom: 18px;
+}
+
+.coming-soon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(10px);
 }

@@ -1,16 +1,13 @@
-// ─── ResultsTable.jsx ────────────────────────────────────────────────────────
-// بيعرض جدول النتايج
-//
-// Props:
-//   results : array من الأماكن — كل عنصر فيه (name, address, category, إلخ)
-//   message : نص بيتعرض لو مفيش نتايج (error أو loading message)
-//   msgType : نوع الـ message ("loading" أو "error") — بيأثر على الـ CSS class
-
-export default function ResultsTable({ results, message, msgType }) {
+export default function ResultsTable({
+  results,
+  message,
+  msgType,
+  onToggleCollection,
+  isInCollection,
+}) {
   return (
     <div className="table-wrapper">
       <table>
-        {/* thead ثابت دايماً — مش بيتغير مع النتايج */}
         <thead>
           <tr>
             <th>#</th>
@@ -19,33 +16,24 @@ export default function ResultsTable({ results, message, msgType }) {
             <th>Category</th>
             <th>Phone</th>
             <th>Status</th>
+            <th>Save</th>
             <th>Map</th>
           </tr>
         </thead>
-
         <tbody>
-          {/* ─── Conditional Rendering بـ Ternary ─── */}
           {message ? (
-            // لو في message → اعرضها في row واحدة بـ colspan=7
             <tr>
-              <td colSpan="7" className={`msg ${msgType || ""}`}>
-                {/* colSpan مش colspan — JSX camelCase */}
+              <td colSpan="8" className={`msg ${msgType || ""}`}>
                 {message}
               </td>
             </tr>
           ) : (
-            // لو مفيش message → اعرض النتايج
             results.map((r, i) => (
-              // i هو الـ index (0, 1, 2, ...) — بنستخدمه للنمبرة
               <tr
                 key={r.mapUrl}
-                // key لازم يكون unique — الـ mapUrl كويس عشان كل مكان عنده URL مختلف
                 onClick={() => window.open(r.mapUrl, "_blank")}
-                // كل الـ row قابلة للضغط وبتفتح Google Maps في tab جديد
                 style={{ cursor: "pointer" }}
               >
-                {/* النمبرة: padStart بتضيف صفر قدام الأرقام الأقل من 10 */}
-                {/* 1 → "01"   /   10 → "10" */}
                 <td
                   style={{
                     fontFamily: "var(--mono)",
@@ -55,45 +43,14 @@ export default function ResultsTable({ results, message, msgType }) {
                 >
                   {String(i + 1).padStart(2, "0")}
                 </td>
-
-                <td className="name">
-                  {r.name}
-                  {/* && هنا: لو r.website موجود → اعرض الـ link */}
-                  {/* لو r.website = null أو "" → مش بيعرض حاجة */}
-                  {r.website && (
-                    <a
-                      href={r.website}
-                      target="_blank"
-                      rel="noreferrer"
-                      // rel="noreferrer" مهم للأمان:
-                      // بيمنع الـ tab الجديد يعرف من فين جه المستخدم
-                      onClick={(e) => e.stopPropagation()}
-                      // stopPropagation مهم!
-                      // لو المستخدم ضغط على الـ link والـ row عندها onClick
-                      // من غير stopPropagation → الاتنين هيتنفذوا
-                      // مع stopPropagation → بس الـ link هيشتغل
-                      style={{
-                        fontSize: "0.68rem",
-                        color: "var(--accent2)",
-                        fontFamily: "var(--mono)",
-                        textDecoration: "none",
-                      }}
-                    >
-                      ↗ website
-                    </a>
-                  )}
-                </td>
-
+                <td className="name">{r.name}</td>
                 <td style={{ fontSize: "0.78rem", maxWidth: "220px" }}>
                   {r.address}
                 </td>
-
                 <td>
-                  <span className="tag">{r.category}</span>
+                  <span className="tag">{r.category.replace(/_/g, " ")}</span>
                 </td>
-
                 <td className="phone">{r.phone}</td>
-
                 <td>
                   <span
                     className={`tag ${r.opening === "Open Now" ? "open" : ""}`}
@@ -101,7 +58,27 @@ export default function ResultsTable({ results, message, msgType }) {
                     {r.opening || "—"}
                   </span>
                 </td>
-
+                <td>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleCollection(r);
+                    }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "1.3rem",
+                      color: isInCollection(r) ? "#ffd43b" : "#555",
+                      transition: "color 0.2s",
+                    }}
+                    title={
+                      isInCollection(r) ? "Remove from saved" : "Save place"
+                    }
+                  >
+                    {isInCollection(r) ? "★" : "☆"}
+                  </button>
+                </td>
                 <td>
                   <a
                     className="map-btn"
