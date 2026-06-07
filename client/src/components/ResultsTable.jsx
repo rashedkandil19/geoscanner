@@ -20,6 +20,7 @@ export default function ResultsTable({
             <th>Map</th>
           </tr>
         </thead>
+
         <tbody>
           {message ? (
             <tr>
@@ -43,14 +44,60 @@ export default function ResultsTable({
                 >
                   {String(i + 1).padStart(2, "0")}
                 </td>
-                <td className="name">{r.name}</td>
-                <td style={{ fontSize: "0.78rem", maxWidth: "220px" }}>
+
+                <td className="name">
+                  {r.name}
+
+                  {r.website && (
+                    <a
+                      href={r.website}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        fontSize: "0.68rem",
+                        color: "var(--accent2)",
+                        display: "block",
+                        marginTop: "4px",
+                        textDecoration: "none",
+                      }}
+                    >
+                      ↗ Website
+                    </a>
+                  )}
+                </td>
+
+                <td
+                  style={{
+                    fontSize: "0.78rem",
+                    maxWidth: "220px",
+                  }}
+                >
                   {r.address}
                 </td>
+
                 <td>
                   <span className="tag">{r.category.replace(/_/g, " ")}</span>
                 </td>
-                <td className="phone">{r.phone}</td>
+
+                <td className="phone">
+                  {r.phone !== "—" ? (
+                    <a
+                      href={`tel:${r.phone}`}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        color: "var(--accent)",
+                        textDecoration: "none",
+                        fontSize: "0.85rem",
+                      }}
+                    >
+                      {r.phone}
+                    </a>
+                  ) : (
+                    "—"
+                  )}
+                </td>
+
                 <td>
                   <span
                     className={`tag ${r.opening === "Open Now" ? "open" : ""}`}
@@ -58,6 +105,7 @@ export default function ResultsTable({
                     {r.opening || "—"}
                   </span>
                 </td>
+
                 <td>
                   <button
                     onClick={(e) => {
@@ -79,6 +127,7 @@ export default function ResultsTable({
                     {isInCollection(r) ? "★" : "☆"}
                   </button>
                 </td>
+
                 <td>
                   <a
                     className="map-btn"

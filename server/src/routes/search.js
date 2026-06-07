@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { getCached, saveCache } from "../services/cacheService.js";
-import { geocode, searchGooglePlaces } from "../services/googleService.js";
+import {
+  geocode,
+  getPlaceDetails,
+  searchGooglePlaces,
+} from "../services/googleService.js";
 
 const router = Router();
 
@@ -14,6 +18,7 @@ router.post("/", async (req, res) => {
   try {
     const coords = await geocode(location);
     const { lat, lon } = coords;
+
     const cached = await getCached(keyword, lat, lon, radius);
     if (cached) {
       return res.json({
@@ -22,12 +27,22 @@ router.post("/", async (req, res) => {
         coords: { lat, lon },
       });
     }
+
     const places = await searchGooglePlaces(lat, lon, radius, keyword);
-    if (places.length > 0) {
-      await saveCache(keyword, lat, lon, radius, places);
+
+    const placesWithDetails = await Promise.all(
+      places.map(async (place) => {
+        const details = await getPlaceDetails(place.place_id);
+        return { ...place, ...details };
+      }),
+    );
+
+    if (placesWithDetails.length > 0) {
+      await saveCache(keyword, lat, lon, radius, placesWithDetails);
     }
+
     return res.json({
-      results: places,
+      results: placesWithDetails,
       fromCache: false,
       coords: { lat, lon },
     });

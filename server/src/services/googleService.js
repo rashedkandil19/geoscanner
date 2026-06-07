@@ -25,3 +25,14 @@ export async function searchGooglePlaces(lat, lon, radiusM, keyword) {
   const d = await r.json();
   return d.results || [];
 }
+
+export async function getPlaceDetails(placeId) {
+  const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=formatted_phone_number,website&key=${GOOGLE_API_KEY}`;
+  const r = await fetch(url);
+  const d = await r.json();
+  return {
+    phone: d.result?.formatted_phone_number || "—",
+    website: d.result?.website || null,
+  };
+}

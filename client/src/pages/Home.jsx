@@ -35,15 +35,115 @@ export default function Home() {
   const [collections, setCollections] = useState(
     JSON.parse(localStorage.getItem("collections")) || [],
   );
+  // svg
+  const removeFromFav = (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="25"
+      height="25"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <line
+        x1="7"
+        y1="7"
+        x2="17"
+        y2="17"
+        stroke="#f5fdff"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <line
+        x1="17"
+        y1="7"
+        x2="7"
+        y2="17"
+        stroke="#f5fdff"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+  const opensNow = (
+    <div style={{ display: " flex", gap: "7px", alignItems: "center" }}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <circle cx="12" cy="12" r="7" stroke="#00d4ff" strokeWidth="2" />
+        <path
+          d="M9 12L11 14L15 10"
+          stroke="#00d4ff"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <p>Open Now</p>
+    </div>
+  );
+  const withWebsiteIcon = (
+    <div
+      style={{
+        display: " flex",
+        gap: "7px",
+        alignItems: "center",
+      }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <circle cx="12" cy="12" r="9" stroke="#00d4ff" strokeWidth="2" />
 
-  // Bug 1 fixed: isInCollection is now outside toggleCollection
+        <path d="M3 12H21" stroke="#00d4ff" strokeWidth="2" />
+
+        <path
+          d="M12 3C14.5 5.5 16 8.7 16 12C16 15.3 14.5 18.5 12 21"
+          stroke="#00d4ff"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+
+        <path
+          d="M12 3C9.5 5.5 8 8.7 8 12C8 15.3 9.5 18.5 12 21"
+          stroke="#00d4ff"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
+      <p>Has Website</p>
+    </div>
+  );
+  const hasPhoneIcon = (
+    <div style={{ display: " flex", gap: "7px", alignItems: "center" }}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <path
+          d="M7.5 4H5.5C4.67 4 4 4.67 4 5.5C4 13.5 10.5 20 18.5 20C19.33 20 20 19.33 20 18.5V16.5L15.5 15L13.5 17C10.8 15.8 8.2 13.2 7 10.5L9 8.5L7.5 4Z"
+          stroke="#00d4ff"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <p>Has Website</p>
+    </div>
+  );
   function isInCollection(place) {
     return collections.some((p) => p.mapUrl === place.mapUrl);
   }
-
-  // Bug 2 fixed: consistent name toggleCollection
-  // Bug 3 fixed: [...collections, place] not [collections, place]
-  // Bug 4 fixed: comma not dot in localStorage.setItem
   function toggleCollection(place) {
     const exists = collections.find((p) => p.mapUrl === place.mapUrl);
     let updated;
@@ -112,8 +212,8 @@ export default function Home() {
         name: place.name || "—",
         address: place.vicinity || "—",
         category: place.types?.[0] || "—",
-        phone: "—",
-        website: null,
+        phone: place.phone || "—",
+        website: place.website || null,
         opening: place.opening_hours?.open_now ? "Open Now" : "Unknown",
         mapUrl: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
         lat: place.geometry?.location?.lat ?? null,
@@ -227,9 +327,9 @@ export default function Home() {
                   }}
                 >
                   {[
-                    { key: "openNow", label: "🟢 Open Now" },
-                    { key: "hasPhone", label: "📞 Has Phone" },
-                    { key: "hasWebsite", label: "🌐 Has Website" },
+                    { key: "openNow", label: opensNow },
+                    { key: "hasPhone", label: hasPhoneIcon },
+                    { key: "hasWebsite", label: withWebsiteIcon },
                   ].map((f) => (
                     <button
                       key={f.key}
@@ -296,7 +396,6 @@ export default function Home() {
             )}
           </div>
         )}
-
         {activeTab === "history" && (
           <div className="container">
             <div className="panel">
@@ -312,54 +411,90 @@ export default function Home() {
                   No search history yet
                 </div>
               ) : (
-                <div style={{ padding: "20px" }}>
-                  {searchHistory.map((search) => (
-                    <div
-                      key={search.id}
-                      style={{
-                        padding: "12px",
-                        borderBottom: "1px solid #333",
-                        cursor: "pointer",
-                        marginBottom: "8px",
-                        position: "relative",
-                      }}
+                <>
+                  <div
+                    style={{
+                      padding: "20px 20px 0",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <button
                       onClick={() => {
-                        setLocation(search.location);
-                        setKeyword(search.keyword);
-                        setRadius(search.radius);
-                        setActiveTab("search");
+                        if (window.confirm("Clear all search history?")) {
+                          setSearchHistory([]);
+                        }
+                      }}
+                      style={{
+                        background: "#ff4444",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "8px 14px",
+                        cursor: "pointer",
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
                       }}
                     >
-                      <div style={{ fontWeight: 500 }}>
-                        {search.keyword} in {search.location}
-                      </div>
-                      <div style={{ fontSize: "0.85rem", color: "#aaa" }}>
-                        {search.timestamp}
-                      </div>
-                      <span
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSearchHistory((prev) =>
-                            prev.filter((item) => item.id !== search.id),
-                          );
-                        }}
+                      Clear All
+                    </button>
+                  </div>
+
+                  <div style={{ padding: "20px" }}>
+                    {searchHistory.map((search) => (
+                      <div
+                        key={search.id}
                         style={{
-                          position: "absolute",
-                          right: "20px",
-                          top: "19px",
+                          padding: "12px",
+                          borderBottom: "1px solid #333",
                           cursor: "pointer",
+                          marginBottom: "8px",
+                          position: "relative",
+                        }}
+                        onClick={() => {
+                          setLocation(search.location);
+                          setKeyword(search.keyword);
+                          setRadius(search.radius);
+                          setActiveTab("search");
                         }}
                       >
-                        X
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                        <div style={{ fontWeight: 500 }}>
+                          {search.keyword} in {search.location}
+                        </div>
+
+                        <div
+                          style={{
+                            fontSize: "0.85rem",
+                            color: "#aaa",
+                          }}
+                        >
+                          {search.timestamp}
+                        </div>
+
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSearchHistory((prev) =>
+                              prev.filter((item) => item.id !== search.id),
+                            );
+                          }}
+                          style={{
+                            position: "absolute",
+                            right: "20px",
+                            top: "19px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {removeFromFav}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           </div>
         )}
-
         {activeTab === "collections" && (
           <div className="container">
             <div className="panel">
