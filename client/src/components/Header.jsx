@@ -2,15 +2,18 @@ export default function Header() {
   return (
     <div className="header">
       <div className="header-icon">
-        <svg viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.35-4.35" />
-          <path d="M11 8v6M8 11h6" />
-        </svg>
+        <img
+          src="public/spotlyLogo1.png"
+          alt="spotly logo"
+          width="150px"
+          height="100px"
+        />
       </div>
       <div className="logo">
-        Geo<span>Scanner</span>
-        <div className="header-sub">GLOBAL SCANNER</div>
+        Spot<span>ly</span>
+        <div className="header-sub">
+          FIND IT. SPOT IT. <span>LOVE IT</span>{" "}
+        </div>
       </div>
     </div>
   );
