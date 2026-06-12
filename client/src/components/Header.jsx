@@ -3,7 +3,7 @@ export default function Header() {
     <div className="header">
       <div className="header-icon">
         <img
-          src="/spotlyLogo1.png"
+          src="/spotlylogo1.png"
           alt="spotly logo"
           width="150px"
           height="100px"
