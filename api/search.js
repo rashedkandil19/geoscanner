@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import { getCached, saveCache } from "../server/src/services/cacheService.js";
+import { getCached, saveCache } from "./cacheService.js";
 import {
   geocode,
   getPlaceDetails,
   searchGooglePlaces,
-} from "../server/src/services/googleService.js";
+} from "./googleService.js";
 
 let isConnected = false;
 
