@@ -8,7 +8,6 @@ const cacheScheme = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 60 * 60 * 24 * 7,
   },
 });
 
