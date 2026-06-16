@@ -16,67 +16,12 @@
   color: var(--accent);
 }
 
-.grid-bg {
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 48px 48px;
-  opacity: 0.35;
-  z-index: 0;
-  pointer-events: none;
-  mask-image: radial-gradient(circle at 50% 0%, black 0%, transparent 70%);
-}
-
-.l-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-}
-.l-nav-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 32px;
-  max-width: 1180px;
-  margin: 0 auto;
-}
-.l-nav-logo {
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 .l-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 12px var(--accent);
-}
-.l-nav-cta {
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background: var(--accent);
-  color: var(--bg);
-  padding: 10px 20px;
-  border-radius: 4px;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
-}
-.l-nav-cta:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
 }
 
 .l-hero {
@@ -131,7 +76,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   background: var(--accent);
-  color: var(--bg);
+  color: black;
   padding: 16px 30px;
   border-radius: 6px;
   display: inline-flex;
@@ -593,4 +538,33 @@
   .landing section {
     padding: 64px 24px;
   }
+}
+.l-scroll-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 54px;
+  height: 54px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(99, 102, 241, 0.25);
+  transition: all 0.25s ease;
+  backdrop-filter: blur(12px);
+}
+
+.l-scroll-top:hover {
+  transform: translateY(-5px) scale(1.05);
+}
+
+.l-scroll-top:active {
+  transform: translateY(-2px) scale(0.98);
 }

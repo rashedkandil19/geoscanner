@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Header from "../components/Header";
 import "../styles/Landing.css";
 
 const DEMO_QUERY = "real estate agencies in Cairo";
@@ -30,7 +31,6 @@ const DEMO_ROWS = [
 ];
 
 export default function Landing() {
-  // ─── Typed text effect state ────────────────────────────────────────────
   const [typedText, setTypedText] = useState("");
   const [sweepActive, setSweepActive] = useState(false);
   const [visibleRows, setVisibleRows] = useState([]);
@@ -80,15 +80,7 @@ export default function Landing() {
       <div className="grid-bg" />
 
       <nav className="l-nav">
-        <div className="l-nav-inner">
-          <div className="l-nav-logo">
-            <span className="l-dot" />
-            Spot<span className="l-accent-text">ly</span>
-          </div>
-          <a href="/app" className="l-nav-cta">
-            Launch App →
-          </a>
-        </div>
+        <Header />
       </nav>
 
       <header className="l-hero">
@@ -353,20 +345,62 @@ export default function Landing() {
           </svg>
         </a>
       </section>
-
+      <ScrollToTopButton />
       <footer className="l-footer">
         <div className="l-footer-inner">
           <div>SPOTLY — FIND IT. SPOT IT. LOVE IT.</div>
-          <div>© 2026 Spotly</div>
+          <div>
+            Spotly © created by Rashed Kandil {new Date().getFullYear()}
+          </div>
         </div>
       </footer>
     </div>
   );
 }
 
-// ─── Small presentational helpers ─────────────────────────────────────────
-// Kept inside this file since they're only used here and are tiny
+function ScrollToTopButton() {
+  const [visible, setVisible] = useState(false);
 
+  useEffect(() => {
+    const toggleVisibility = () => {
+      setVisible(window.scrollY > 400);
+    };
+
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  if (!visible) return null;
+
+  return (
+    <button
+      onClick={scrollToTop}
+      className="l-scroll-top"
+      aria-label="Scroll to top"
+    >
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 19V5" />
+        <path d="M5 12L12 5L19 12" />
+      </svg>
+    </button>
+  );
+}
 function Feature({ icon, extra, title, text }) {
   return (
     <div className="l-feature">
