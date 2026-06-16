@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import "../styles/landing.css";
+import "../styles/Landing.css";
 
 const DEMO_QUERY = "real estate agencies in Cairo";
 const DEMO_ROWS = [
