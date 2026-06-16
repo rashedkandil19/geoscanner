@@ -81,6 +81,9 @@ export default function Landing() {
 
       <nav className="l-nav">
         <Header />
+        <a href="/app" className="l-nav-cta">
+          Launch App →
+        </a>
       </nav>
 
       <header className="l-hero">
