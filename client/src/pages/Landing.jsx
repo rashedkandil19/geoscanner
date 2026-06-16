@@ -36,24 +36,6 @@ export default function Landing() {
   const [visibleRows, setVisibleRows] = useState([]);
   const demoRef = useRef(null);
   const hasRun = useRef(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasRun.current) {
-            hasRun.current = true;
-            runDemo();
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.4 },
-    );
-
-    if (demoRef.current) observer.observe(demoRef.current);
-    return () => observer.disconnect();
-  }, []);
-
   function runDemo() {
     let i = 0;
     const typeInterval = setInterval(() => {
@@ -74,6 +56,24 @@ export default function Landing() {
       }
     }, 38);
   }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasRun.current) {
+            hasRun.current = true;
+            runDemo();
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.4 },
+    );
+
+    if (demoRef.current) observer.observe(demoRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="landing">
