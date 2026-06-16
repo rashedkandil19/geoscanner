@@ -85,7 +85,7 @@ export default function Landing() {
             <span className="l-dot" />
             Spot<span className="l-accent-text">ly</span>
           </div>
-          <a href="/app" className="l-nav-cta">
+          <a href="/client/src/pages/Home.jsx" className="l-nav-cta">
             Launch App →
           </a>
         </div>
@@ -104,7 +104,7 @@ export default function Landing() {
         </p>
 
         <div className="l-hero-actions">
-          <a href="/app" className="l-btn-primary">
+          <a href="/client/src/pages/Home.jsx" className="l-btn-primary">
             Find It. Spot It. Love It.
             <svg
               width="14"
@@ -339,7 +339,7 @@ export default function Landing() {
           Spotly is free to try right now — no setup, just a location and a
           keyword.
         </p>
-        <a href="/app" className="l-btn-primary">
+        <a href="/client/src/pages/Home.jsx" className="l-btn-primary">
           Launch Spotly
           <svg
             width="14"
