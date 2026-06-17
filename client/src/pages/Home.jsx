@@ -215,7 +215,7 @@ export default function Home() {
         phone: place.phone || "—",
         website: place.website || null,
         opening: place.opening_hours?.open_now ? "Open Now" : "Unknown",
-        mapUrl: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}&query_place_id=${place.place_id}`,
         lat: place.geometry?.location?.lat ?? null,
         lon: place.geometry?.location?.lng ?? null,
       }));
